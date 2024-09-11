@@ -1,0 +1,31 @@
+#map {
+    height: 95vh;
+}
+
+.leaflet-image-layer {
+    image-rendering: crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+}
+
+.navbar-brand {
+    display: flex;
+}
+
+.navbar-brand img {
+    width: auto;
+    height: 4vh;
+    max-width: 100%;
+    max-height: 100%;
+    padding-right: 5px;
+}
+
+img.navbar-brand {
+    width: auto;
+    height: 4.5vh;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.navbar {
+    height: 5vh;
+}

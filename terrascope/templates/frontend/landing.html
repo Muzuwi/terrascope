@@ -1,0 +1,103 @@
+{% from "macros/_form.html" import render_form %}
+
+{% set page_title = 'Terrascope' %}
+
+{% extends 'layouts/base.html' %}
+
+{% block body %}
+
+<div class="container">
+  <div id="map"></div>
+</div>
+
+<script>
+  const map = L.map('map', {
+    crs: L.CRS.Simple,
+    minZoom: -5,
+  }).setView([0, 0], 0);
+
+  async function fetchSnapshots() {
+    const response = await fetch('/api/v1/snapshots');
+    return response.json();
+  }
+
+  function groupSnapshotsByWorld(snapshots) {
+    const byWorldName = snapshots.reduce((groups, snapshot) => {
+      const worldName = snapshot.world_name;
+      if (!groups[worldName]) {
+        groups[worldName] = [];
+      }
+      groups[worldName].push(snapshot);
+      return groups;
+    }, {});
+    for (const world in byWorldName) {
+      byWorldName[world].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+    return byWorldName;
+  }
+
+  function switchToSnapshot(snapshot) {
+    const dropdownButton = document.getElementById('snapshotDropdown');
+
+    // FIXME: Update with up-to-date snapshot dimensions
+    const imageBounds = [[0, 0], [2400, 8400]];
+    const imageUrl = `/api/v1/snapshot/${snapshot.id}/image`;
+    changeMapImage(imageUrl, imageBounds);
+    dropdownButton.textContent = `${snapshot.world_name} - ${new Date(snapshot.timestamp).toLocaleString()}`
+  }
+
+  async function populateSnapshotList() {
+    try {
+      const snapshots = await fetchSnapshots();
+      const groupedSnapshots = groupSnapshotsByWorld(snapshots);
+
+      const dropdown = document.getElementById('snapshotList');
+      dropdown.innerHTML = '';
+
+      for (const worldName in groupedSnapshots) {
+        const headerItem = document.createElement('li');
+        headerItem.innerHTML = `<h6 class="dropdown-header">${worldName}</h6>`;
+        dropdown.appendChild(headerItem);
+
+        groupedSnapshots[worldName].forEach(snapshot => {
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `<a class="dropdown-item" href="#" data-snapshot-id="${snapshot.id}">${new Date(snapshot.timestamp).toLocaleString()}</a>`;
+          dropdown.appendChild(listItem);
+
+          listItem.addEventListener('click', (event) => {
+            event.preventDefault();
+            switchToSnapshot(snapshot);
+          });
+        });
+      }
+
+      const latestSnapshot = snapshots.reduce((latest, snapshot) => {
+        return new Date(snapshot.timestamp) > new Date(latest.timestamp) ? snapshot : latest;
+      });
+      switchToSnapshot(latestSnapshot);
+    } catch (error) {
+      console.error('Error loading snapshots:', error);
+    }
+  }
+
+  async function changeMapImage(imageUrl, imageBounds) {
+    try {
+      map.eachLayer(function (layer) {
+        if (layer instanceof L.ImageOverlay) {
+          map.removeLayer(layer);
+        }
+      });
+      L.imageOverlay(imageUrl, imageBounds).addTo(map);
+      map.fitBounds(imageBounds);
+    } catch (error) {
+      console.error('Error loading snapshot image:', error);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', populateSnapshotList);
+
+</script>
+
+
+
+{% endblock %}

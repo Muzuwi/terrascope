@@ -1,0 +1,8 @@
+Flask[async]
+Flask-SQLAlchemy
+Flask-Caching
+pytest
+Jinja2
+Werkzeug
+watchdog
+flyingsnake

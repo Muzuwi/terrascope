@@ -63,6 +63,12 @@ def configure_app(app: Flask, config: terrascope.config.BaseConfig = None):
             "This must be set to a long random bytestring. You can generate one by running: "
             "python -c 'import secrets; print(secrets.token_hex())'"
         )
+    if app.config["TERRASCOPE_DATA_DIRECTORY"] == "":
+        raise RuntimeError(
+            "'TERRASCOPE_DATA_DIRECTORY' was not provided in the configuration. "
+            "This must point to a folder somewhere on the filesystem where database "
+            "and captures will be stored at."
+        )
 
 
 def configure_blueprints(app, blueprints):

@@ -2,6 +2,7 @@
 # ![icon] Terrascope
 
 A simple self-hosted, web-based Terraria world viewer and timelapser.
+Example modification.
 
 [present]: docs/present.png
 ![present]

@@ -28,7 +28,7 @@ For persistent deployments that will run alongside a Terraria server (constantly
 ```yaml
 services:
   terrascope:
-    image: "ghcr.io/muzuwi/terrascope:latest"
+    image: "muzuwi/terrascope:latest"
     restart: always
     command: run -h 0.0.0.0
     volumes:
@@ -73,7 +73,7 @@ sudo docker run \
     -e TERRASCOPE_WORLD_DIRECTORY=/worlds \
     -e SQLALCHEMY_DATABASE_URI=sqlite:////data/terrascope.db \
     -e SECRET_KEY=<replace-with-random-hex-string> \
-    --rm -it ghcr.io/muzuwi/terrascope:latest \
+    --rm -it muzuwi/terrascope:latest \
     run -h 0.0.0.0
 ```
 
